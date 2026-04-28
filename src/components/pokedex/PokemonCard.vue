@@ -19,10 +19,18 @@ export default{
             // 'https://pokeapi.co/api/v2/pokemon/2/'
             if (this.pokemon) {
                 let id = this.pokemon.url.split('/').filter(Boolean).pop()
-                console.log(id)
+                // console.log(id)
                 return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif` 
             } else {
                 return ''
+            }
+        }
+    },
+    methods: {
+        verDetalhes() {
+            if (this.pokemon) {
+                let id = this.pokemon.url.split('/').filter(Boolean).pop()
+                this.$router.push({name: 'pokemon-detalhes', params: {id}})
             }
         }
     }
@@ -31,16 +39,25 @@ export default{
 <template>
     <b-card 
         :title="capitalize"
-        class="text-center mb-3"
-        style="height: 100%;"
+        class="mb-3"
+        body-class="text-center card-pokemon"
     >
         <b-img 
             :src="pegarImagem"
-            style="height: 100px;"
+            style="width: 100px; height: 100px;"
             class="mb-2"
         />
-        <b-button variant="primary">
+        <b-button variant="primary" @click="verDetalhes">
             Ver Detalhes
         </b-button>
     </b-card>
 </template>
+<style>
+    .card-pokemon {
+        width: 250px;
+        height: 250px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+</style>
