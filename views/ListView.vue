@@ -1,6 +1,6 @@
 <script lang="ts">
-import PokemonCard from '@/components/pokedex/PokemonCard.vue';
 import axios from 'axios';
+import PokemonCard from '@/components/PokemonCard.vue';
 
 export default {
     name: "ListView",
@@ -10,25 +10,26 @@ export default {
     data() {
         return {
             pokemons: [],
-            total_pokemons: 0,
             limit: 20,
-            pagina_atual: 1,
+            total: 0,
+            page: 1,
             offset: 0,
             busca: ''
         }
     },
-    mounted() {
-        console.log("Componente montado")
+    mounted(){
         this.listarPokemons()
     },
     computed: {
         pokemonsFiltrados() {
-            return this.pokemons.filter(pokemon => pokemon.name.includes(this.busca.toLowerCase()))
+            return this.busca 
+            ? this.pokemons.filter(p => p.name.includes(this.busca.toLowerCase())) 
+            : this.pokemons
         }
     },
     watch: {
-        pagina_atual(novo_valor) {
-            this.offset = (novo_valor - 1) * this.limit
+        page(newPage) {
+            this.offset = (newPage - 1) * this.limit
             this.listarPokemons()
         }
     },
@@ -37,10 +38,12 @@ export default {
             const api = axios.create({
                 baseURL: `https://pokeapi.co/api/v2/pokemon?limit=${this.limit}&offset=${this.offset}`
             })
+
             try {
                 let resposta = await api.get("")
+                console.log(resposta)
                 this.pokemons = resposta.data.results
-                this.total_pokemons = resposta.data.count
+                this.total = resposta.data.count
             } catch (erro) {
                 console.log(erro)
             }
@@ -52,18 +55,17 @@ export default {
     <div class="d-flex container align-items-center flex-column">
         <b-form-input
             v-model="busca"
-            class="w-50 mb-3"
-            placeholder="Busque pelo nome de um pokemon"
+            placeholder="Busque um pokémon pelo nome"
+            class="mb-3 w-50"
         />
         <b-row>
             <b-col class="mb-3" v-for="pokemon in pokemonsFiltrados" :key="pokemon.name">
-                <PokemonCard :pokemon="pokemon"></PokemonCard>
+                <PokemonCard :pokemon="pokemon"/>
             </b-col>
         </b-row>
         <b-pagination
-            class="mt-3"
-            v-model="pagina_atual"
-            :total-rows="total_pokemons"
+            v-model="page"
+            :total-rows="total"
             :per-page="limit"
         />
     </div>
